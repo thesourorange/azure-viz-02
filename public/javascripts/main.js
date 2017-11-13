@@ -69,14 +69,13 @@ $(document).ready(function() {
                 $('#receiptImage').css('height', '380px');
 
                 $('#ReceiptText').css('top', '-35px');
-                $('#TessOCRText').css('top', '-35px');
-  
+   
                 $('#tessLoader').css('display', 'block');
-
+                $('#cogLoader').css('display', 'block');
+                
                 setTimeout(callTessaract, 0, file);
-                
-           //     uploadToServer(reader.result, data2Blob(reader.result));
-                
+                callCogOCR(file, reader.result);
+                                
 			};
 			
 			//begin reader read operation
@@ -101,8 +100,79 @@ $(document).ready(function() {
                 $('#tessLoader').css('display', 'none');             
                 $('#tessResult').html(result.html);     
                 $('#tessResult').css('overflow', 'auto');     
-                $('#tessResult').css('height', '380px');     
+                $('#tessResult').css('height', '380px');  
+                $('#TessOCRText').css('top', '-35px');
+                
             })
+        } catch (e) {
+            alert(e);
+        }
+
+    }
+
+    /**
+     * Call Microsoft's Conginitive OCR 
+     * 
+     * @param {*} file the File returned from the upload
+     * @param {*} content  the Content
+     */
+    function callCogOCR(file, content) {
+
+        try {
+        var uriBase = "https://westcentralus.api.cognitive.microsoft.com/vision/v1.0/RecognizeText";
+        var subscriptionKey = "28d06e43b8a940078499d4c92217a38f";
+        
+        var params = {
+            "handwriting": "false",
+        };
+
+        var objFormData = new FormData();
+        objFormData.append('userfile', file);
+    
+        $.ajax({
+            url: uriBase + "?" + $.param(params),
+
+            // Request headers.
+            beforeSend: function(jqXHR){
+                jqXHR.setRequestHeader("Content-Type", "application/octet-stream");
+                jqXHR.setRequestHeader("Ocp-Apim-Subscription-Key", subscriptionKey);
+            },
+            type: "POST",
+            processData: false,  
+            data: data2Blob(content)
+        })
+        .done(function(data) {
+
+            try {
+                var html = "";
+               for (var iRegion = 0; iRegion < data['regions'].length; iRegion++) {
+  
+                    html += processLines(data['regions'][iRegion]);
+
+                }
+
+           } catch (e) {
+                alert(e);
+            }
+
+            $('#cogResult').html(html); 
+            $('#cogResult').css('overflow', 'auto');     
+            $('#cogResult').css('height', '380px');     
+            $('#cogLoader').css('display', 'none');
+            $('#CogOCRText').css('top', '-35px');
+            
+            
+        })
+
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            // Display error message.
+            var errorString = (errorThrown === "") ? "Error. " : errorThrown + " (" + jqXHR.status + "): ";
+            errorString += (jqXHR.responseText === "") ? "" : jQuery.parseJSON(jqXHR.responseText).message;
+
+            alert(errorString);
+
+        });
+
         } catch (e) {
             alert(e);
         }
@@ -112,13 +182,11 @@ $(document).ready(function() {
     /**
      * Convert Data to a Blob (base64 encoded)
      * 
-     * @param {*} data 
+     * @param {*} data to convert (base64) encoded
      */
     function data2Blob(data) {       
         // convert base64 to raw binary data held in a string
         // doesn't handle URLEncoded DataURIs
-
-        alert (data);
 
         var byteString;
 
@@ -144,33 +212,36 @@ $(document).ready(function() {
         var dataView = new DataView(ab);
         var blob = new Blob([dataView], {type: mimeString});
      
-        alert (blob);        
-
         return blob;
     
     }
 
-	var uploadToServer = function(file, blob) {
-		// prepare FormData
-		var formData = new FormData();  
-		//since new file doesn't contains original file data
-		formData.append('filename', file.name);
-		formData.append('filetype', file.type);
-		formData.append('file', blob); 
-					
-		//submit formData using $.ajax			
-		$.ajax({
-			url: 'upload',
-			type: 'POST',
-			data: formData,
-			processData: false,
-			contentType: false,
-			success: function(data) {
-				console.log(data);
-            }
-            
-        });	
-        
-	}
+    function processLines(object) {
+        var html = "";
+        var lines = object['lines'];
+
+        for (var iLine = 0; iLine < lines.length; iLine++) {
+
+            html += processWords(lines[iLine]);
+            html += "<p style='height:4px;'>";
+        }
+
+        return html;
+
+    }
+
+    function processWords(object) {
+        var html = "";
+        var words = object['words'];
+
+        for (var iWord = 0; iWord < words.length; iWord++) {
+
+            html += words[iWord].text + " &nbsp; ";
+
+        }
+
+        return html;
+
+    }
 
 });

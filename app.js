@@ -8,8 +8,6 @@ var routes = require('./routes');
 var http = require('http');
 var path = require('path');
 var pug = require('pug');
-var multiparty = require('multiparty');
-var util = require('util');
 
 var app = express();
 
@@ -41,20 +39,6 @@ function logError(message) {
 }
   
 app.get('/', routes.index);
-
-app.post('/upload', function (req, res, next) { 
-    var form = new multiparty.Form();
-
-    console.log('In upload');
-   
-    form.parse(req, function(err, fields, files) {
-       res.writeHead(200, {'content-type': 'text/plain'});
-       res.write('received upload:\n\n');
-       res.end(util.inspect({fields: fields, files: files}));
-
-    });
-
-});
 
 http.createServer(app).listen(app.get('port'), function() {
   console.log('Express server listening on port: \'' + app.get('port') +'\'');

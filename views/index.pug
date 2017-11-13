@@ -37,5 +37,7 @@ block content
     div#cogarea
       div#cogLoader(style='z-index:1; display:none; position: absolute; opacity: 0.5; margin-top:120px; margin-left:75px;' class='loader')
       p
-      img#receiptCogOCR(src='/icons/brain.svg' style='margin-top:40px; width:120px; height:120px; display:block; margin: auto auto')
-      p#TCogOCRText(style='position:relative; top:225px; opacity: 0.5;') Microsoft's Cognitive OCR
+      div#cogResult(style="overflow:auto;")
+        img#receiptCogOCR(src='/icons/brain.svg' style='margin-top:40px; width:120px; height:120px; display:block; margin: auto auto')
+      div#CogOCRText(style='position:relative; top:225px; background:white; opacity: 0.5;')
+        p Microsoft Coginitive OCR
