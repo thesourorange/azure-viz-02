@@ -1,0 +1,41 @@
+extends layout
+
+block content
+  script(src="/javascripts/responder.js")
+  div.main(style="width: 100%; height:100%; overflow:hidden;")
+
+  script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")  
+  script(src='https://cdn.rawgit.com/naptha/tesseract.js/1.0.10/dist/tesseract.js')
+  script(src="/javascripts/main.js")
+
+  h1#header &nbsp; Receipt OCR Processor
+  p
+  div#droparea
+    div#dropareainner
+      p
+      img(src='/icons/cloud-computing.svg' style='width:96; height:96px') 
+      p#dropfiletext Drop receipts here
+      p or
+      p
+        input#uploadbtn(class='uploadbtn' type='button' value="Select Files")
+    input#upload(type='file' multiple)
+  p
+
+  div#analysisarea
+    div#receiptarea
+      p
+      img#receiptImage(src='/icons/invoice.svg' style='margin-top:40px; width:120px; height:120px; display:block; margin: auto auto') 
+      div#ReceiptText(style='position:relative; top:225px; background:white; opacity: 0.5;') 
+        p Receipt
+    div#tessarea
+      div#tessLoader(style='z-index:1; display:none; position: absolute; opacity: 0.5; margin-top:120px; margin-left:75px;' class='loader')
+      p 
+      div#tessResult(style="overflow:auto;")
+        img#receiptTessOCR(src='/icons/3d.svg' style='margin-top:40px; width:120px; height:120px; display:block; margin: auto auto') 
+      div#TessOCRText(style='position:relative; top:225px; background:white; opacity: 0.5;') 
+        p Tesseract OCR
+    div#cogarea
+      div#cogLoader(style='z-index:1; display:none; position: absolute; opacity: 0.5; margin-top:120px; margin-left:75px;' class='loader')
+      p
+      img#receiptCogOCR(src='/icons/brain.svg' style='margin-top:40px; width:120px; height:120px; display:block; margin: auto auto')
+      p#TCogOCRText(style='position:relative; top:225px; opacity: 0.5;') Microsoft's Cognitive OCR
