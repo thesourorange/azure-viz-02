@@ -1,6 +1,6 @@
 # azure-viz
 
-Azure Viz is a simple Video Indexer example that store the videos within Azure Blob
+Azure Viz 02 is an example of Microsoft's OCR services
 
 To allow for larger upload sizes than 10M change the web.conf within the 'site' directory
 
